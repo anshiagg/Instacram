@@ -1,5 +1,5 @@
 // change this when you integrate with the real API, or when u start using the dev server
-const API_URL = 'http://localhost:8080/data'
+const API_URL = 'http://localhost:5000'
 
 const getJSON = (path, options) => 
     fetch(path, options)
@@ -36,6 +36,12 @@ export default class API {
      */
     getMe() {
         return this.makeAPIRequest('me.json');
+    }
+    /**
+     *  @returns the list of users in JSON format
+     */
+    getUsers() {
+        return this.makeAPIRequest('users.json');
     }
 
 }

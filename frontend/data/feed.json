@@ -15,7 +15,7 @@
         "id": 2,
         "meta": {
             "author": "Sarah",
-            "description_text": "",
+            "description_text": "Mountains",
             "published": "Sat Aug 04 2018 20:20:12 GMT+1000 (Australian Eastern Standard Time)",
             "likes": [],
             "comments": []
@@ -27,7 +27,7 @@
         "id": 3,
         "meta": {
             "author": "Sarah",
-            "description_text": "",
+            "description_text": "Lake",
             "published": "Sat Aug 04 2018 20:20:12 GMT+1000 (Australian Eastern Standard Time)",
             "likes": [],
             "comments": []
@@ -39,10 +39,10 @@
         "id": 4,
         "meta": {
             "author": "Sarah",
-            "description_text": "",
+            "description_text": "Valleys",
             "published": "Sat Aug 04 2018 20:20:12 GMT+1000 (Australian Eastern Standard Time)",
-            "likes": [],
-            "comments": []
+            "likes": ["Rose", "Emily"],
+            "comments": ["Jane"]
         },
         "thumbnail": "4_q.jpg",
         "src": "4_h.jpg"
@@ -51,10 +51,10 @@
         "id": 5,
         "meta": {
             "author": "Sarah",
-            "description_text": "",
+            "description_text": "More mountains",
             "published": "Sat Aug 04 2018 20:20:12 GMT+1000 (Australian Eastern Standard Time)",
             "likes": [],
-            "comments": []
+            "comments": ["Maria"]
         },
         "thumbnail": "5_q.jpg",
         "src": "5_h.jpg"
