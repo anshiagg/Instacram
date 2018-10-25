@@ -1,4 +1,5 @@
 import {renderFeed} from './main.js';
+import API from './api.js';
 
 /* returns an empty array of size max */
 export const range = (max) => Array(max).fill(null);
@@ -42,7 +43,7 @@ export function createLoginForm() {
     myForm.appendChild(createElement('br', null));
     myForm.appendChild(createElement('label', 'Password:', {class : 'labels'}));
     myForm.appendChild(createElement('br', null));
-    myForm.appendChild(createElement('input', null, {type: 'text', placeholder: 'Enter password here', required : null} ));
+    myForm.appendChild(createElement('input', null, {type: 'text', placeholder: 'Enter password here', required : null, id: 'pass'} ));
     myForm.appendChild(createElement('br', null));
     myForm.appendChild(createElement('button', 'Login', {type: 'submit', id: 'submit'}));
     const register = createElement('a', 'Not yet a member?', {id : 'register-link', href : '#'});
@@ -62,51 +63,116 @@ function createRegisterForm() {
     const myForm = createElement('div', null, {class : 'form'});
     myForm.appendChild(createElement('label', 'Username:', {class : 'labels'}));
     myForm.appendChild(createElement('br', null));
-    myForm.appendChild(createElement('input', null, {type: 'text', placeholder: 'Enter username here', required : null, id: 'name'} ));
+    var uname = createElement('input', null, {type: 'text', placeholder: 'Enter username here', id: 'name'});
+    uname.required = true;
+    myForm.appendChild(uname);
     myForm.appendChild(createElement('br', null));
     myForm.appendChild(createElement('label', 'Name:', {class : 'labels'}));
     myForm.appendChild(createElement('br', null));
-    myForm.appendChild(createElement('input', null, {type: 'text', placeholder: 'Enter name here', required : null, id: 'real_name'} ));
+    var name = createElement('input', null, {type: 'text', placeholder: 'Enter name here', id: 'real_name'} );
+    name.required = true;
+    myForm.appendChild(name);
     myForm.appendChild(createElement('br', null));
     myForm.appendChild(createElement('label', 'Password:', {class : 'labels'}));
     myForm.appendChild(createElement('br', null));
-    myForm.appendChild(createElement('input', null, {type: 'text', placeholder: 'Enter password here', required : null} ));
+    var password = createElement('input', null, {type: 'text', placeholder: 'Enter password here', id : 'pass'});
+    password.required = true;
+    myForm.appendChild(password);
+    myForm.appendChild(createElement('br', null));
+    myForm.appendChild(createElement('label', 'Email:', {class : 'labels'}));
+    myForm.appendChild(createElement('br', null));
+    var email = createElement('input', null, {type: 'text', placeholder: 'Enter email here', id : 'email'});
+    email.required = true;
+    myForm.appendChild(email);
     myForm.appendChild(createElement('br', null));
     const button = createElement('button', 'Register', {type: 'submit', id: 'register-button'});
     myForm.appendChild(button);
     button.addEventListener('click', register);
     section.appendChild(myForm);
     main.appendChild(section);
+    console.log(uname);
+    console.log(name);
+    console.log(email);
+    console.log(password);
 
 }
 
 
 
 function register(e) {
-    const user = {};
-    user.username = document.getElementById('name').value;
-    user.name = document.getElementById('real_name').value;
-    user.posts = [];
-    const p1 = fetch ('./data/users.json')
-        .then(response => response.json())
-        .then(json => {
-            user.id = json.length + 1;  
-        })
 
+    // First, we get all the fields
+    var username = document.getElementById('name').value;
+    var name = document.getElementById('real_name').value;
+    var password = document.getElementById('pass').value;
+    var email = document.getElementById('email').value;
 
-    if (checkStore(user.username) != null) {
-        if (!document.getElementById('register-error')) {
-            const section = createElement('div', 'Username already exists', {class : 'error', id : 'register-error'});
+    // Now, for some error checking, first check if all fields are filled up
+    if (username == "" || name == "" || password == "" || email == "") {
+
+        // Got this from stack overflow, to delete all error classes
+        var paras = document.getElementsByClassName('error');
+        while(paras[0]) 
+            paras[0].parentNode.removeChild(paras[0]);
+
+        if (!document.getElementById('register-empty-error')) {
+            const section = createElement('div', 'Please fill in all fields', {class : 'error', id : 'register-empty-error'});
             const form = document.getElementById('register');
             form.appendChild(section);
+            return;
         }
-    } else {
-        window.localStorage.setItem('status', 'loggedIn');
-        window.localStorage.setItem('current', user.name);
-        window.localStorage.setItem(user.username, user.name);
-        renderFeed();
-        console.log("WE HERE");
     }
+
+    // Next, check if the email is valid
+	const pattern = /[a-zA-Z0-9]+@[a-zA-Z0-9]+\.[a-z0-9A-Z]+/i;
+	if (!(pattern.exec(email))) {
+        var paras = document.getElementsByClassName('error');
+        while(paras[0]) 
+            paras[0].parentNode.removeChild(paras[0]);
+
+        if (!document.getElementById('register-email-error')) {
+            const section = createElement('div', 'Please enter a valid email (A@A.A)', {class : 'error', id : 'register-email-error'});
+            const form = document.getElementById('register');
+            form.appendChild(section);
+            return;
+        }
+    }
+
+    // Remove all errors if any
+    var paras = document.getElementsByClassName('error');
+    while(paras[0]) 
+        paras[0].parentNode.removeChild(paras[0]);
+
+    // Now, we are going to make our user object
+    const user = {};
+    user.username = username;
+    user.password = password;
+    user.email = email;
+    user.name = name;
+    console.log(user);
+
+    // Then, we make a call to the API
+    const api = new API();
+    api.register(user).then(json => {
+        const tok = json.token;
+        if (tok == undefined) {
+            var paras = document.getElementsByClassName('error');
+            while(paras[0]) 
+                paras[0].parentNode.removeChild(paras[0]);
+
+            if (!document.getElementById('register-username-error')) {
+                const section = createElement('div', 'Username already taken', {class : 'error', id : 'register-username-error'});
+                const form = document.getElementById('register');
+                form.appendChild(section);
+                return;
+            }
+        }
+        window.localStorage.setItem('status', 'loggedIn');
+        renderFeed(tok);
+        console.log("WE HERE");
+
+    });
+
 
 }
 /**
@@ -120,13 +186,13 @@ export function createPostTile(post) {
     section.appendChild(createElement('h2', post.meta.author, { class: 'post-title' }));
 
     section.appendChild(createElement('img', null, 
-        { src: '/images/'+post.src, alt: post.meta.description_text, class: 'post-image' }));
+        { src: 'data:image/png;base64,' + post.src, alt: post.meta.description_text, class: 'post-image' }));
 
     section.appendChild(createElement('div', post.meta.likes.length + ' likes', {class : 'likes'}));
     section.appendChild(createElement('p', post.meta.description_text, {class : 'post-description'}));
 
-    section.appendChild(createElement('time', getFormattedDate(post.meta.published), {class :'post-time', datetime : post.meta.published }));
-    section.appendChild(createElement('div', post.meta.comments.length + ' comments', {class : 'post-comments'}));
+    section.appendChild(createElement('time', post.meta.published, {class :'post-time', datetime : post.meta.published }));
+    section.appendChild(createElement('div', post.comments.length + ' comments', {class : 'post-comments'}));
 
     return section;
 }
@@ -177,18 +243,57 @@ export function checkStore(key) {
 
 export function getDetails(event) {
     const username = document.getElementById('name').value;
-    console.log(username);
+    const password = document.getElementById('pass').value;
+    var user = {};
+    user["username"] = username;
+    user["password"] = password;
+    //console.log(user);
+    const api = new API();
+    api.authenticate(user)
+    .then(response => {
+        console.log(response);
+        const tok = response.token;
+        if (tok === undefined) {
+            if (!document.getElementById('login-error')) {
+                const section = createElement('div', 'Wrong username/password', {class : 'error', id : 'login-error'});
+                const form = document.getElementById('login');
+                form.appendChild(section);
+            }
+        } else {
+            window.localStorage.setItem('status', 'loggedIn');
+            renderFeed(tok);
+            console.log("WE HERE");
+        }
+
+    });
+
+    /*
     if (checkStore(username) == null) {
         if (!document.getElementById('login-error')) {
             const section = createElement('div', 'Wrong username', {class : 'error', id : 'login-error'});
             const form = document.getElementById('login');
             form.appendChild(section);
         }
-    } else {
-        window.localStorage.setItem('status', 'loggedIn');
-        window.localStorage.setItem('current', checkStore(username));
-        renderFeed();
-        console.log("WE HERE");
-    }
+        */
+
+       // window.localStorage.setItem('current', checkStore(username));
     
+}
+
+export function logout(e) {
+    window.localStorage.setItem('status', 'loggedOut');
+    var main = document.getElementById('large-feed');
+    while (main.firstChild) {
+        main.removeChild(main.firstChild);
+    }
+    const navbar = document.getElementById('nav');
+    while (navbar.firstChild) {
+        navbar.removeChild(navbar.firstChild);
+    }
+    const form = createLoginForm();
+    main.appendChild(createLoginForm());
+    const button = document.getElementById('submit');
+    console.log(button);
+    button.addEventListener('click', getDetails);
+
 }

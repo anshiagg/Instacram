@@ -1,1 +1,2 @@
-13/10/18     18:00   18:15   put the first real entry in diary.txt (delete this line!)
+16/10/18    10:00 16:00  Worked on subset 0 adding likes, comments, time, etc
+21/10/18   15:00   19:00 Worked on adding a login and registration form
