@@ -387,6 +387,26 @@ function showLikes(e, post, auth_token) {
 
 function like(e, auth_token, post) {
     const api = new API();
+    const p1 = api.get_post(auth_token, post.id);
+    const p2 = api.getMe(auth_token);
+    var found = false;
+    Promise.all([p1,p2]).then((values) => {
+        console.log(values[0]);
+        console.log(values[1]);
+       for (var userId in values[0].meta.likes) {
+            if (values[0].meta.likes[userId] == values[1].id) {
+                found = true;
+                api.unlike_post(post.id, auth_token).then(() => {
+                    const postLikes = document.getElementById(post.id);
+                    api.get_post(auth_token, post.id).then((json) => {
+                        postLikes.innerText = json.meta.likes.length + ' likes';
+                    })
+                })
+                return;
+            }
+       }
+    })
+    if (found == true) return;
     api.like_post(post.id, auth_token).then(() => {
         const postLikes = document.getElementById(post.id);
         api.get_post(auth_token, post.id).then((json) => {

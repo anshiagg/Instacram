@@ -122,6 +122,14 @@ export default class API {
     }).then(response => console.log(response))
    }
 
+   unlike_post(post, auth_token) {
+    console.log(auth_token);
+    return fetch(`${this.url}/post/unlike?id=${post}`, {
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json' , 'Authorization': `Token ${auth_token}`},
+        method : 'PUT',
+    }).then(response => console.log(response))
+   }
+
    getUser(auth_token, id) {
     return fetch (`${this.url}/user/?id=${id}`, {
         method : 'GET',
