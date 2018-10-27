@@ -31,6 +31,20 @@ export default class API {
             headers: {'Accept' : 'application/json', 'Content-type' : 'application/json', 'Authorization' : `Token ${auth_token}`}
         }) 
     }
+
+    follow(auth_token, username) {
+        return fetch(`${this.url}/user/follow?username=${username}`, {
+            method : 'PUT',
+            headers: {'Accept' : 'application/json', 'Content-type' : 'application/json', 'Authorization' : `Token ${auth_token}`}
+        })  
+    }
+
+    unfollow(auth_token, username) {
+        return fetch(`${this.url}/user/unfollow?username=${username}`, {
+            method : 'PUT',
+            headers: {'Accept' : 'application/json', 'Content-type' : 'application/json', 'Authorization' : `Token ${auth_token}`}
+        })  
+    }
     /**
      * @returns feed array in json format
      */
@@ -40,7 +54,17 @@ export default class API {
             method : 'GET',
             headers: {'Accept' : 'application/json', 'Content-type' : 'application/json', 'Authorization' : `Token ${auth_token}`}
         }).then(response => response.json())
-        //.then(json => console.log(json))
+    
+    }
+
+    getCustomFeed(auth_token, start) {
+        console.log("in get custom feed");
+        return fetch(`${this.url}/user/feed?p=${start}`, {
+            method : 'GET',
+            headers: {'Accept' : 'application/json', 'Content-type' : 'application/json', 'Authorization' : `Token ${auth_token}`}
+        }).then(response => response.json())
+
+
     }
 
     /**
@@ -88,6 +112,72 @@ export default class API {
         //body : JSON.parse(`{"username" : "${user.username}", "password": "${user.password}"}`)
         body : JSON.stringify(user)
     }).then(response => response.json())
+   }
+
+   like_post(post, auth_token) {
+    console.log(auth_token);
+    return fetch(`${this.url}/post/like?id=${post}`, {
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json' , 'Authorization': `Token ${auth_token}`},
+        method : 'PUT',
+    }).then(response => console.log(response))
+   }
+
+   getUser(auth_token, id) {
+    return fetch (`${this.url}/user/?id=${id}`, {
+        method : 'GET',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization' : `Token ${auth_token}` }
+    }).then(response => response.json())
+   }
+
+   getUserByUsername(auth_token, username) {
+    return fetch (`${this.url}/user/?username=${username}`, {
+        method : 'GET',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization' : `Token ${auth_token}` }
+    }).then(response => response.json())   
+   }
+
+   make_comment(auth_token, comment, id) {
+    return fetch (`${this.url}/post/comment?id=${id}`, {
+        method : 'PUT',
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json', 'Authorization' : `Token ${auth_token}` },
+        body: JSON.stringify(comment)
+    }).then(response => response.json())
+   }
+
+   make_post(auth_token, post) {
+    return fetch(`${this.url}/post/`, {
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json' , 'Authorization' : `Token ${auth_token}`},
+        method : 'POST',
+        body : JSON.stringify(post)
+    }).then(response => response.json())
+   }
+
+   get_post(auth_token, id) {
+    return fetch(`${this.url}/post/?id=${id}`, {
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json' , 'Authorization' : `Token ${auth_token}`},
+        method : 'GET',
+    }).then(response => response.json())
+   }
+
+   update_post(auth_token, post, id) {
+    return fetch(`${this.url}/post/?id=${id}`, {
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json' , 'Authorization' : `Token ${auth_token}`},
+        method : 'PUT',
+        body : JSON.stringify(post)
+    })
+   }
+   update_user(auth_token, update) {
+    return fetch(`${this.url}/user/`, {
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json' , 'Authorization' : `Token ${auth_token}`},
+        method : 'PUT',
+        body: JSON.stringify(update)
+    }).then(response => response.json())
+   }
+   delete_post(auth_token, id) {
+    return fetch(`${this.url}/post/?id=${id}`, {
+        headers: {'Accept': 'application/json', 'Content-Type': 'application/json' , 'Authorization' : `Token ${auth_token}`},
+        method : 'DELETE',
+    })
    }
 
 }

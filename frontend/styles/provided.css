@@ -32,11 +32,73 @@ footer {
     margin: 10px 25px;
 }
 
-.nav {
-    list-style-type: none;
+.topnav {
     padding: 0;
+    overflow : hidden;
+    background-color: #3b75d3;
+}
+.topnav-item {
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    border-right: 1px solid #f2f2f2;
+    text-decoration: none;
+    font-size: 17px;
+    text-decoration:none;
 }
 
+.topnav-item a{
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    text-decoration:none;
+}
+
+.topnav-item:link{
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    text-decoration:none;
+}
+
+.topnav-item a:hover{
+    float: left;
+    color: #d83220;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    text-decoration:none;
+}
+
+
+.topnav-item:active{
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    text-decoration:none;
+}
+
+.topnav-item:visited{
+    float: left;
+    color: #f2f2f2;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    font-size: 17px;
+    text-decoration:none;
+}
+/*
 .nav-item {
     border: 1px solid rgba(0, 0, 0, 0.1);
     margin: auto;
@@ -44,7 +106,7 @@ footer {
     display: inline;
     list-style-type: none;
 }
-
+*/
 .post {
     max-width: 640px;
     overflow: hidden;
@@ -56,7 +118,7 @@ footer {
 .post-title {
     padding: 20px 40px;
     margin: 0;
-    border-bottom: 1px solid rgba(0,0,0,.0975);
+    cursor : pointer;
 }
 
 .post-thumb {
@@ -70,6 +132,7 @@ footer {
 .post-image {
     width: 640px;
     height: 640px;
+    cursor: pointer;
 }
 
 .login-title {
@@ -147,4 +210,115 @@ button:hover {
     margin-top : 80px;
     margin-left: 400px;
     margin-bottom: 60px;
+}
+#login-link {
+    margin-top : 80px;
+    margin-left: 400px;
+    margin-bottom: 60px;
+}
+.likes:link {
+    font-weight: 600;
+    color: #262626;
+    text-decoration: none
+}
+
+.likes:hover {
+    font-weight: 600;
+    color: #262626;
+    text-decoration: none
+}
+.likes:active {
+    font-weight: 600;
+    color: #262626;
+    text-decoration: none
+}
+.likes:visited {
+    font-weight: 600;
+    color: #262626;
+    text-decoration: none
+}
+.post-comments:link {
+    font-weight: 600;
+    color: #262626;
+    text-decoration: none
+}
+
+.post-comments:hover {
+    font-weight: 600;
+    color: #262626;
+    text-decoration: none
+}
+.post-comments:active {
+    font-weight: 600;
+    color: #262626;
+    text-decoration: none
+}
+.post-comments:visited {
+    font-weight: 600;
+    color: #262626;
+    text-decoration: none
+}
+.glyphicon.glyphicon-heart {
+    font-size: 35px;
+    color: #ea0a0b;
+}
+.heart:hover{
+    cursor : pointer
+}
+
+.btn.btn-primary {
+  color: #ffffff;
+  background-color: #d05fd8;
+  border-color: #d05fd8;
+}
+.btn.btn-primary:hover,
+.btn.btn-primary:focus,
+.btn.btn-primary:active {
+  color: #ffffff;
+  background-color: #cd78d3;
+  border-color: #cd78d3;
+}
+
+#profile-username {
+    text-align:center;
+    color: #262626;
+}
+
+#profile-username-inner {
+    color: #262626;
+    display: 'inline-block';
+}
+
+.profile-top {
+    margin-bottom: 20px;
+    list-style: none;
+    text-align: center;
+
+}
+
+.profile-top-item {
+    display :'inline';
+    float : none;
+}
+
+#dropdownMenuButton:after {
+    content: '\2807';
+    font-size: 30px;
+    background-color: #ffffff;
+    cursor : pointer;
+    float: right;
+}
+
+.dropdown-menu {
+    top: 8px;
+    right: 16px;
+    float: right;
+}
+
+.dropdown-menu.show {
+    position: relative !important;
+}
+
+#home {
+    cursor : pointer;
 }

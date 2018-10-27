@@ -1,2 +1,7 @@
-16/10/18    10:00 16:00  Worked on subset 0 adding likes, comments, time, etc
-21/10/18   15:00   19:00 Worked on adding a login and registration form
+16/10/18    10:00 16:00  			Worked on subset 0 adding likes, comments, time, etc
+21/10/18   15:00   19:00 			Worked on adding a login and registration form, and using the api for login and feed
+25/10/18   09:00   12:15 			Worked on using the api to register
+25/10/18   14:30   00:30 next day 	Worked on subset 2 and implemented likes, comments, profile page, making posts, and seeing likes and comments
+26/10/18   11:00   22:20            Worked on subset 3 and implemented all parts except infinite scrolling
+27/10/18   10:00   14:00			Worked on fixing some bugs with posting, following, unfollowing and commenting
+27/10/18   16:00   20:00  			Worked on implementing infinite scroll, and implemented it
