@@ -1,4 +1,4 @@
-import {renderFeed, checkLoadMore} from './main.js';
+import {renderFeed, checkLoadMore, makeHome} from './main.js';
 import API from './api.js';
 
 /* returns an empty array of size max */
@@ -653,11 +653,17 @@ export function follow(auth_token) {
                     modalBody.appendChild(section);
                 }
                 const numFollowing = document.getElementById('num-following');
-                if (numFollowing == null) return;
-                api.getMe(auth_token).then((user) => {
-                    console.log(user);
-                    numFollowing.innerText = user.following.length + " following";
-                })
+                if (numFollowing == null) {
+                    if (document.getElementById('profile-username')) return;
+                    makeHome();
+                    return;
+                }
+                else {
+                        api.getMe(auth_token).then((user) => {
+                        console.log(user);
+                        numFollowing.innerText = user.following.length + " following";
+                    })
+                }
             }
         })
     })
@@ -725,7 +731,11 @@ export function unfollow(auth_token) {
                     modalBody.appendChild(section);
                 }
                 const numFollowing = document.getElementById('num-following');
-                if (numFollowing == null) return;
+                if (numFollowing == null) {
+                    if (document.getElementById('profile-username')) return;
+                    makeHome();
+                    return;
+                }
                 api.getMe(auth_token).then((user) => {
                     console.log(user);
                     numFollowing.innerText = user.following.length + " following";

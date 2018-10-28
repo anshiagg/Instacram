@@ -76,6 +76,21 @@ export default class API {
 
     }
 
+    /** Get latest post
+     * @param auth_token
+     * @param start number for feed
+     * @returns feed array in json format
+     */
+    getLatestPost(auth_token) {
+        console.log("in get latest post");
+        return fetch(`${this.url}/user/feed?p=0&n=1`, {
+            method : 'GET',
+            headers: {'Accept' : 'application/json', 'Content-type' : 'application/json', 'Authorization' : `Token ${auth_token}`}
+        }).then(response => response.json())
+
+
+    }
+
     /** Code to get the user pointed to by the auth_token
      * @param authorization_token
      * @returns auth'd user in json format

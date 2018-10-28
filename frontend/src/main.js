@@ -5,8 +5,21 @@ import { createLoginForm, createRegisterForm, update, follow, closeFollowModal, 
 import API from './api.js';
 
 // This is a global variable I use for infinite scrolling
-var startNumber;
+var startNumber = 0;
 var loadFlag = false;
+
+// Push notification function
+//setInterval(checkPostMade, 200);
+
+/*
+function checkPostMade() {
+
+    if (checkStore('status') == 'loggedOut') return;
+    const api = new API();
+    if (api.get)
+
+}
+*/
 // Main function which creates the home page first time user logs in
 export function renderFeed(auth_token) {
 
@@ -85,7 +98,7 @@ export function renderFeed(auth_token) {
 }
 
 // Function which actually adds the feed to the home page
-function makeHome() {
+export function makeHome() {
 
     var current = window.location.href;
     window.location.href = current.replace(/#(.*)$/, '') + '#feed';
@@ -137,7 +150,7 @@ export function checkLoadMore() {
 
     var bodyHeight = height - windowHeight;
     var scrollPercentage = (top / bodyHeight);
-    console.log(top + " " + windowHeight +  " " + height + " " + bodyHeight + " " + scrollPercentage);
+    //console.log(top + " " + windowHeight +  " " + height + " " + bodyHeight + " " + scrollPercentage);
 
     // if the scroll is more than 90% from the top, load more content.
     if(scrollPercentage > 0.8) {
