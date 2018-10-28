@@ -32,6 +32,7 @@ export function createElement(tag, data, options = {}) {
         }, el);
 }
 
+// Function to create a login form
 export function createLoginForm() {
 
     const section = createElement('section', null, {class : 'login', id : 'login'});
@@ -54,6 +55,7 @@ export function createLoginForm() {
     return section;
 }
 
+// Function to create a registration form
 function createRegisterForm() {
     const main = document.getElementById('large-feed');
     if (document.getElementById('login') != null) {
@@ -94,16 +96,12 @@ function createRegisterForm() {
     myForm.appendChild(link);
     section.appendChild(myForm);
     main.appendChild(section);
-    console.log(uname);
-    console.log(name);
-    console.log(email);
-    console.log(password);
 
 }
 
 
 
-
+// Function to register the user once they press register on register form
 function register(e) {
 
     // First, we get all the fields
@@ -154,7 +152,6 @@ function register(e) {
     user.password = password;
     user.email = email;
     user.name = name;
-    console.log(user);
 
     // Then, we make a call to the API
     const api = new API();
@@ -187,7 +184,7 @@ function register(e) {
  * @returns {HTMLElement}
  */
 export function createPostTile(post, auth_token) {
-    const section = createElement('section', null, { class: 'post' });
+    const section = createElement('section', null, { class: 'post', id : `post-${post.id}` });
     const parentDiv = createElement('span', null, {class : 'post-title'});
     const userName = createElement('h2', post.meta.author, {id : 'post-username', style : "float:left"});
     userName.addEventListener('click', () => showPublicProfile(auth_token, post.meta.author));
@@ -234,6 +231,12 @@ export function createPostTile(post, auth_token) {
     span2.addEventListener('click', closeComments);
     return section;
 }
+
+/**
+ * Given the id, deletes the post
+ * @param   {string} auth_token
+ * @param   {number} id
+ */
 function deletePost(auth_token, id) {
     const api = new API();
     const promise = api.delete_post(auth_token, id);
@@ -243,7 +246,15 @@ function deletePost(auth_token, id) {
         }
     })
 }
+
+/**
+ * Given the id, creates the updating post modal
+ * @param   {string} auth_token
+ * @param   {number} id
+ */
 function updatePostModal(auth_token, id) {
+
+    // Create necessary html
     const modal = document.getElementById('updatePostsModal');
     const postsBody = document.getElementById("update-posts-body");
     var postLink = document.getElementById('update-post-link');
@@ -253,8 +264,8 @@ function updatePostModal(auth_token, id) {
         postsBody.appendChild(postLink);
     } 
     const postFooter = document.getElementById('update-post-button');
-    console.log(postLink.files);
 
+    // Add an event to the update button
     postFooter.addEventListener('click', (event) => {
         const desc = document.getElementById('update-post-desc');
         // Remove all errors if any
@@ -278,11 +289,11 @@ function updatePostModal(auth_token, id) {
         }
 
     });
-    //const api = new API();
+
     modal.style.display = 'block';
 }
 
-// Given an input element of type=file, grab the data uploaded for use
+// Given an input element of type=file, updates it
 function updateImage(id, desc, file, auth_token) {
     const img = {};
     const api = new API();
@@ -329,8 +340,7 @@ function updateImage(id, desc, file, auth_token) {
             if (promise.status !== 200) {
                 console.log("failed");
             }
-            //const image = createElement('img', null, { src: dataURL });
-            //document.body.appendChild(image);
+
         };
 
         // this returns a base64 image
@@ -338,27 +348,8 @@ function updateImage(id, desc, file, auth_token) {
     }
     
 }
-/*
-<div class="modal" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">&times;</span>
-                          </button>
-                        </div>
-                        <div class="modal-body">
-                          ...
-                        </div>
-                        <div class="modal-footer">
-                          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                          <button type="button" class="btn btn-primary">Save changes</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-*/
+
+// Function to show the likes modal, given a post and authorization token
 function showLikes(e, post, auth_token) {
     const modal = document.getElementById('likesModal');
     const heading = document.getElementById('likesTitle');
@@ -369,10 +360,14 @@ function showLikes(e, post, auth_token) {
     console.log(e.target);
     console.log(post);
     const api = new API();
+
+    // Gets information about post
     api.get_post(auth_token, post.id)
     .then((json) => {
         for (var user in json.meta.likes) {
             console.log(json.meta.likes[user]);
+
+            // Gets information about each user and adds that to the list of users who liked the post
             api.getUser(auth_token,json.meta.likes[user]).then(json2 => {
                 const like_user = createElement('li', json2.username, {class : 'list-group-item'} );
                 listLikes.appendChild(like_user);
@@ -384,7 +379,7 @@ function showLikes(e, post, auth_token) {
     modal.style.display = 'block';
 
 }
-
+// Function that handles when a user clicks on the heart icon
 function like(e, auth_token, post) {
     const api = new API();
     const p1 = api.get_post(auth_token, post.id);
@@ -394,6 +389,7 @@ function like(e, auth_token, post) {
         console.log(values[0]);
         console.log(values[1]);
        for (var userId in values[0].meta.likes) {
+           // If user already liked the post, the post is unliked
             if (values[0].meta.likes[userId] == values[1].id) {
                 found = true;
                 api.unlike_post(post.id, auth_token).then(() => {
@@ -407,6 +403,7 @@ function like(e, auth_token, post) {
        }
     })
     if (found == true) return;
+    // Otherwise, post will be liked by user
     api.like_post(post.id, auth_token).then(() => {
         const postLikes = document.getElementById(post.id);
         api.get_post(auth_token, post.id).then((json) => {
@@ -415,11 +412,14 @@ function like(e, auth_token, post) {
     })
 }
 
+// Close the comments modal
 function closeComments(e) {
     const modal = document.getElementById('commentsModal');
     modal.style.display = 'none';
 }
 
+
+// Show the comments modal when the user clicks on the comments link
 function showComments(e, post, auth_token) {
     console.log("in show comments");
     var flag = false;
@@ -431,6 +431,7 @@ function showComments(e, post, auth_token) {
     const listComments = createElement('ul', null, {class: 'list-group list-group-flush', id :'list-comments'});
     console.log(post);
     const api = new API();
+    // Get info on post and show the necessary comments
     api.get_post(auth_token, post.id).then((json => {
         for (var user in json.comments) {
             console.log(json.comments[user]);
@@ -441,15 +442,8 @@ function showComments(e, post, auth_token) {
             const time = createElement('small', timeConverter(json.comments[user].published), {});
             comment.appendChild(text);
             comment.appendChild(time);
-            //text.appendChild(cur_user);
-            //text.innerText += post.comments[user].comment;
             listComments.appendChild(comment);
-            /*
-            api.getUser(auth_token,post.meta.likes[user]).then(json => {
-                const like_user = createElement('li', json.username, {class : 'list-group-item'} );
-                listLikes.appendChild(like_user);
-            });
-            */
+
         }
         commentsBody.appendChild(listComments);
     }))
@@ -457,58 +451,50 @@ function showComments(e, post, auth_token) {
     const commentBtn = document.getElementById('comment-button');
     const commentInput = document.getElementById('new-comment-desc');
     commentInput.value = "";
+
+    // Function to handle when a new comment is made
     commentBtn.addEventListener('click', (event) => {
         if (flag == true) return;
         flag = true;
-        console.log(post.id);
-        console.log(e.target.id);
+        // Just some error checking to ensure we are commenting on the right post
         var temp = e.target.id;
         const pattern = /-comment/i;
         if (pattern.exec(e.target.id)) {
             temp = temp.replace(pattern, '');
             console.log("here");
         }
-        console.log(temp);
+
         if (post.id != temp) return;
+
+        // If empty comment, do nothing
         if (commentInput.value == "") {
-            /*
-            var paras = document.getElementsByClassName('error');
-            while(paras[0]) 
-                paras[0].parentNode.removeChild(paras[0]);
-            if (!document.getElementById('empty-comment-desc-error')) {
-                const section = createElement('div', 'No comment found', {class : 'error', id : 'empty-comment-desc-error'});
-                commentsBody.appendChild(section);
-            }
-            */
             return;
         }
-        console.log("Here in event listener of button");
-        console.log(e.target.id);
+
+        // Post the comment
         postComment(auth_token, commentInput.value, post).then(() => {
             commentInput.value = "";
         })
         console.log(`${post.id}`);
-        //commentInput.value = "";
-       //const listComments = document.getElementById('list-comments');
-        /*
-        if (listComments.lastChild) {
-            listComments.removeChild(listComments.lastChild);
-        }
-        */
     });
     modal.style.display = 'block';
 
 }
 
+// Function to handle posting of comments
 function postComment(auth_token, desc, post) {
     const api = new API();
     const comment = {};
     console.log("Here in postComment");
     return api.getMe(auth_token)
     .then(json => {
+
+        // Set up the comments object
         comment.author = json.username;
         comment.published = (new Date()).getTime()/1000;
         comment.comment = desc;
+
+        // Make api call, then append to the list the new comment for live updating
         api.make_comment(auth_token, comment, post.id).then(() => {
             
             const listComments = document.getElementById('list-comments');
@@ -520,9 +506,10 @@ function postComment(auth_token, desc, post) {
             const time = createElement('small', timeConverter((new Date()).getTime()/1000), {});
             comment.appendChild(text);
             comment.appendChild(time);
-            //text.appendChild(cur_user);
-            //text.innerText += post.comments[user].comment;
+
             listComments.appendChild(comment);
+
+            // Also changes the number of comments text under each post
             api.get_post(auth_token, post.id).then((json) => {
                 const numComments = document.getElementById(`${post.id}-comment`);
                 numComments.innerText = `${json.comments.length} comments`;
@@ -531,12 +518,13 @@ function postComment(auth_token, desc, post) {
         })
     })
 }
-
+// Function to handle closing of likes modal
 function closeLikes(e) {
+    console.log("Here in closeLikes");
     const modal = document.getElementById('likesModal');
     modal.style.display = 'none';
 }
-
+// Function to handle creation of update profile modal
 export function update(auth_token) {
     const modal = document.getElementById('updateModal');
     const updateButton = document.getElementById('update-button');
@@ -548,6 +536,8 @@ export function update(auth_token) {
         var paras = document.getElementsByClassName('alert alert-danger');
         while(paras[0]) 
             paras[0].parentNode.removeChild(paras[0]);
+
+        // Some error checking
         if (newName == "" && newPass == "" && newEmail == "") {
             if (!document.getElementById('empty-update-desc-error')) {
                 const section = createElement('div', 'Nothing to update', {class : 'alert alert-danger', id : 'empty-update-desc-error'});
@@ -580,17 +570,22 @@ export function update(auth_token) {
         paras[0].parentNode.removeChild(paras[0]);
     modal.style.display = 'block';
 }
+
+// Function to close the update profile modal
 export function closeUpdate() {
     const modal = document.getElementById('updateModal');
     modal.style.display = 'none';  
 }
 
+// Function to create the follow modal
 export function follow(auth_token) {
     const modal = document.getElementById('followModal');
     const followButton = document.getElementById('follow-button');
     const followTitle = document.getElementById('followTitle');
     followTitle.innerText = "Follow";
     const modalBody = document.getElementById('follow-body');
+
+    // Event listener for when user clicks on the follow button
     followButton.addEventListener('click', ()=> {
         console.log(followTitle.innerText);
         if (followTitle.innerText == "Unfollow") return;
@@ -598,9 +593,10 @@ export function follow(auth_token) {
         var paras = document.getElementsByClassName('alert alert-success');
         while(paras[0]) 
             paras[0].parentNode.removeChild(paras[0]);
-            var paras = document.getElementsByClassName('alert alert-danger');
-            while(paras[0]) 
-                paras[0].parentNode.removeChild(paras[0]);
+        var paras = document.getElementsByClassName('alert alert-danger');
+        while(paras[0]) 
+            paras[0].parentNode.removeChild(paras[0]);
+        // Some error checking
         if (followName == "") {
             if (!document.getElementById('empty-follow-desc-error')) {
                 const section = createElement('div', 'Please enter a username', {class : 'alert alert-danger', id : 'empty-follow-desc-error'});
@@ -608,6 +604,7 @@ export function follow(auth_token) {
             }
             return;
         }
+        // Make follow call to API
         const api = new API();
         api.follow(auth_token, followName)
         .then(response => {
@@ -641,11 +638,13 @@ export function follow(auth_token) {
     modal.style.display = 'block';
 }
 
+// Function to close the follow modal
 export function closeFollowModal() {
     const modal = document.getElementById('followModal');
     modal.style.display = 'none';  
 }
 
+// Function to create the unfollow modal - very similar to follow
 export function unfollow(auth_token) {
     const modal = document.getElementById('followModal');
     const followButton = document.getElementById('follow-button');
@@ -698,7 +697,7 @@ export function unfollow(auth_token) {
     })
     modal.style.display = 'block';
 }
-
+// Function to close the unfollow modal
 export function closeUnFollowModal() {
     const modal = document.getElementById('followModal');
     modal.style.display = 'none';  
@@ -753,16 +752,19 @@ export function uploadImage(desc, file, auth_token) {
         console.log(auth_token);
         console.log(img);
         api.make_post(auth_token, img);
-        //const image = createElement('img', null, { src: dataURL });
-        //document.body.appendChild(image);
+
     };
 
     // this returns a base64 image
     reader.readAsDataURL(file);
 }
 
+// Function to make the modal to create a new post, very similar to updateImage
 export function postImage(event, auth_token, user) {
     var flag = false;
+    var paras = document.getElementsByClassName('alert');
+    while(paras[0]) 
+        paras[0].parentNode.removeChild(paras[0]);
     const modal = document.getElementById('postsModal');
     const heading = document.getElementById('postsTitle');
     heading.innerText = "Make a new post!";
@@ -781,19 +783,19 @@ export function postImage(event, auth_token, user) {
         flag = true;
         const desc = document.getElementById('new-post-desc');
         // Remove all errors if any
-        var paras = document.getElementsByClassName('error');
+        var paras = document.getElementsByClassName('alert');
         while(paras[0]) 
             paras[0].parentNode.removeChild(paras[0]);
         if (desc.value == "") {
             if (!document.getElementById('empty-post-desc-error')) {
-                const section = createElement('div', 'Give it a caption!', {class : 'error', id : 'empty-post-desc-error'});
+                const section = createElement('div', 'Give it a caption!', {class : 'alert alert-danger', id : 'empty-post-desc-error'});
                 postsBody.appendChild(section);
             }
             return;
         }
         if (postLink.files[0] == undefined) {
             if (!document.getElementById('empty-post-img-error')) {
-                const section = createElement('div', 'No image uploaded', {class : 'error', id : 'empty-post-img-error'});
+                const section = createElement('div', 'No image uploaded', {class : 'alert alert-danger', id : 'empty-post-img-error'});
                 postsBody.appendChild(section);
             }
             return;
@@ -803,10 +805,14 @@ export function postImage(event, auth_token, user) {
         if (postPromise == false) {
             console.log(desc.value);
             if (!document.getElementById('invalid-post-format-error')) {
-                const section = createElement('div', 'Only .jpg, .png, .jpeg format supported', {class : 'error', id : 'invalid-post-formate-error'});
+                const section = createElement('div', 'Only .jpg, .png, .jpeg format supported', {class : 'alert alert-danger', id : 'invalid-post-format-error'});
                 postsBody.appendChild(section);
             }
             return;
+        }
+        if (!document.getElementById('post-image-successs')) {
+            const section = createElement('div', 'Post successfull', {class : 'alert alert-success', id : 'post-image-success'});
+            postsBody.appendChild(section);
         }
 
     });
@@ -814,17 +820,12 @@ export function postImage(event, auth_token, user) {
     modal.style.display = 'block';
 }
 
+// Function to close the make a post modal
 export function closePosts(event) {
     const modal = document.getElementById('postsModal');
     modal.style.display = 'none';
 }
 
-/* 
-    Reminder about localStorage
-    window.localStorage.setItem('AUTH_KEY', someKey);
-    window.localStorage.getItem('AUTH_KEY');
-    localStorage.clear()
-*/
 
 
 export function checkStore(key) {
@@ -834,13 +835,14 @@ export function checkStore(key) {
         return null
 }
 
+// Function to get login details after user clicks login
 export function getDetails(event) {
     const username = document.getElementById('name').value;
     const password = document.getElementById('pass').value;
     var user = {};
     user["username"] = username;
     user["password"] = password;
-    //console.log(user);
+
     const api = new API();
     api.authenticate(user)
     .then(response => {
@@ -873,10 +875,12 @@ export function getDetails(event) {
        // window.localStorage.setItem('current', checkStore(username));
     
 }
-
+// Function to make a user's public profile page
 function showPublicProfile(auth_token, username) {
     window.removeEventListener("scroll", checkLoadMore);
     const api = new API();
+
+    // Gets the current user by username
     api.getUserByUsername(auth_token, username).then((json) => {
         console.log(json);
 
@@ -886,6 +890,7 @@ function showPublicProfile(auth_token, username) {
             feed.removeChild(feed.firstChild);
         }
 
+        // Create necessary DOM elements
         const user = createElement('div', null, {id : 'profile-username'} );
         user.appendChild(createElement('h2', json.username, {id : 'profile-username-inner'}));
         user.appendChild(createElement('small',json.name, {}));
@@ -902,26 +907,30 @@ function showPublicProfile(auth_token, username) {
         const likesNum = createElement('li', null, {class : 'profile-top-item list-item-inline'});
         likesNum.appendChild(createElement('h4',null, {class : 'mb-1', id : 'likes-num'}));
         info.appendChild(likesNum);
-        //const likes = calculateLikes(json.posts, auth_token);
-        //console.log(likes);
+
         feed.appendChild(user);
         feed.appendChild(info);
+
+        // Find total number of likes, by summing likes over all posts of user
         const likes = document.getElementById('likes-num');
         var num_likes = 0;
-        let p = Promise.resolve();
-        for (let i = 0, p = Promise.resolve(); i < json.posts.length; i++) {
-            p = p.then(() => {
-                api.get_post(auth_token, json.posts[i]).then((post) => {
-                    const cur_post = createPostTile(post, auth_token);
-                    num_likes += post.meta.likes.length;
-                    likes.innerText = `${num_likes} likes`;
-                    feed.appendChild(cur_post);
-                })
-            });
+        const promiseArray = [];
+        for (let i = 0; i < json.posts.length; i++) {
+             promiseArray.push(api.get_post(auth_token, json.posts[i]));
         }
+        Promise.all(promiseArray).then((values) => {
+            for (let j = values.length - 1; j >= 0; j--) {
+                 const cur_post = createPostTile(values[j], auth_token);
+                 num_likes += values[j].meta.likes.length;
+                 likes.innerText = `${num_likes} likes`;
+                 feed.appendChild(cur_post);
+            }
+        })
+
     })
 }
 
+// Makes the personal user profile page - very similar to public profile, except you can see a list of people you follow
 export function makeProfile(auth_token) {
     window.removeEventListener("scroll", checkLoadMore);
     const api = new API();
@@ -946,55 +955,36 @@ export function makeProfile(auth_token) {
         info.appendChild(followersNum);
         const followingNum = createElement('li', null, {class : 'profile-top-item list-item-inline'});
         followingNum.appendChild(createElement('h4', `${json.following.length} following`, {class : 'mb-1', style : "cursor:pointer"}));
+
+        // You can see a list of people you are following by clicking on the following number
         followingNum.addEventListener('click', ()=> showFollowing(auth_token,json.following));
         info.appendChild(followingNum);
         const likesNum = createElement('li', null, {class : 'profile-top-item list-item-inline'});
         likesNum.appendChild(createElement('h4',null, {class : 'mb-1', id : 'likes-num'}));
         info.appendChild(likesNum);
-        //const likes = calculateLikes(json.posts, auth_token);
-        //console.log(likes);
+
         feed.appendChild(user);
         feed.appendChild(info);
         const likes = document.getElementById('likes-num');
         var num_likes = 0
-        /*
-        let p = Promise.resolve();
-        for (let i = 0, p = Promise.resolve(); i < json.posts.length; i++) {
-            p = p.then(() => {
-                api.get_post(auth_token, json.posts[i]).then((post) => {
-                    const cur_post = createPostTile(post, auth_token);
-                    num_likes += post.meta.likes.length;
-                    likes.innerText = `${num_likes} likes`;
-                    feed.appendChild(cur_post);
-                })
-            });
-        }
-        */
-       const promiseArray = [];
-       for (let i = 0; i < json.posts.length; i++) {
+        const promiseArray = [];
+        for (let i = 0; i < json.posts.length; i++) {
             promiseArray.push(api.get_post(auth_token, json.posts[i]));
-       }
-       Promise.all(promiseArray).then((values) => {
-           for (let j = values.length - 1; j >= 0; j--) {
+        }
+        Promise.all(promiseArray).then((values) => {
+            for (let j = values.length - 1; j >= 0; j--) {
                 const cur_post = createPostTile(values[j], auth_token);
                 num_likes += values[j].meta.likes.length;
                 likes.innerText = `${num_likes} likes`;
                 feed.appendChild(cur_post);
-           }
-       })
-        /*
-        for (var post in json.posts) {
-            api.get_post(auth_token, json.posts[post]).then((post) => {
-                const cur_post = createPostTile(post, auth_token);
-                feed.appendChild(cur_post);
-            })
-        }
-        */
+            }
+        })
 
     })
 
 }
 
+// Shows all the people the user is following
 function showFollowing(auth_token, following) {
     const modal = document.getElementById('likesModal');
     const heading = document.getElementById('likesTitle');
@@ -1011,27 +1001,12 @@ function showFollowing(auth_token, following) {
         });
     }
     followingBody.appendChild(listFollowing);
+    const span = document.getElementsByClassName("close")[0];
+    span.addEventListener('click', closeLikes);
     modal.style.display = 'block';
 }
 
-/*
-function calculateLikes(posts, auth_token) {
-    const api = new API();
-    console.log(posts);
-    var sum = 0;
-    for (let i = 0, p = Promise.resolve(); i <posts.length; i++) {
-        p = p.then(() => {
-                api.get_post(auth_token, posts[i]).then((json) => {
-                console.log(json);
-                sum += json.meta.likes.length;
-                console.log(sum);
-            })
-        }
-        ));
-    }
-
-}
-*/
+// Function to handle logging a user out
 export function logout(e) {
     window.localStorage.setItem('status', 'loggedOut');
     var main = document.getElementById('large-feed');

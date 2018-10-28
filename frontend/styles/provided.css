@@ -268,15 +268,14 @@ button:hover {
 
 .btn.btn-primary {
   color: #ffffff;
-  background-color: #d05fd8;
-  border-color: #d05fd8;
+  background-color: #3b75d3;
+  border-color: #3b75d3;
 }
 .btn.btn-primary:hover,
 .btn.btn-primary:focus,
 .btn.btn-primary:active {
   color: #ffffff;
-  background-color: #cd78d3;
-  border-color: #cd78d3;
+  opacity: 0.8;
 }
 
 #profile-username {
