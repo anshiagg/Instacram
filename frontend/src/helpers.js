@@ -48,7 +48,7 @@ export function createLoginForm() {
     myForm.appendChild(createElement('input', null, {type: 'text', placeholder: 'Enter password here', required : null, id: 'pass'} ));
     myForm.appendChild(createElement('br', null));
     myForm.appendChild(createElement('button', 'Login', {type: 'submit', id: 'submit'}));
-    const register = createElement('a', 'Not yet a member?', {id : 'register-link', href : '#'});
+    const register = createElement('a', 'Not yet a member?', {id : 'register-link', href : '#register'});
     register.addEventListener('click', createRegisterForm);
     myForm.appendChild(register);
     section.appendChild(myForm);
@@ -56,11 +56,13 @@ export function createLoginForm() {
 }
 
 // Function to create a registration form
-function createRegisterForm() {
+export function createRegisterForm() {
     const main = document.getElementById('large-feed');
     if (document.getElementById('login') != null) {
         main.removeChild(document.getElementById('login'));
     }
+    var current = window.location.href;
+    window.location.href = current.replace(/#(.*)$/, '') + '#' + 'register';
     const section = createElement('section', null, {class : 'register', id : 'register'});
     section.appendChild(createElement('h4', 'Registration form', { class: 'title' }));
     const myForm = createElement('div', null, {class : 'form'});
@@ -91,8 +93,8 @@ function createRegisterForm() {
     const button = createElement('button', 'Register', {type: 'submit', id: 'register-button'});
     button.addEventListener('click', register);
     myForm.appendChild(button);
-    const link = createElement('a', 'Back to login', {id : 'login-link', href : ''});
-    //register.addEventListener('click', createLogin);
+    const link = createElement('a', 'Back to login', {id : 'login-link', href : '/'});
+    //link.addEventListener('click', createLogin);
     myForm.appendChild(link);
     section.appendChild(myForm);
     main.appendChild(section);
@@ -901,13 +903,15 @@ export function getDetails(event) {
         const tok = response.token;
         if (tok === undefined) {
             if (!document.getElementById('login-error')) {
-                const section = createElement('div', 'Wrong username/password', {class : 'error', id : 'login-error'});
+                const section = createElement('div', 'Wrong username/password', {class : 'alert alert-danger', id : 'login-error'});
                 const form = document.getElementById('login');
                 form.appendChild(section);
             }
         } else {
             window.localStorage.setItem('status', 'loggedIn');
             window.localStorage.setItem('cur_user', username);
+            var current = window.location.href;
+            window.location.href = current.replace(/#(.*)$/, '') + '#';
             renderFeed(tok);
             console.log("WE HERE");
         }
@@ -927,10 +931,11 @@ export function getDetails(event) {
     
 }
 // Function to make a user's public profile page
-function showPublicProfile(auth_token, username) {
+export function showPublicProfile(auth_token, username) {
     window.removeEventListener("scroll", checkLoadMore);
     const api = new API();
-
+    var current = window.location.href;
+    window.location.href = current.replace(/#(.*)$/, '') + '#' + `profile=${username}`;
     // Gets the current user by username
     api.getUserByUsername(auth_token, username).then((json) => {
         console.log(json);
@@ -984,6 +989,7 @@ function showPublicProfile(auth_token, username) {
 // Makes the personal user profile page - very similar to public profile, except you can see a list of people you follow
 export function makeProfile(auth_token) {
     window.removeEventListener("scroll", checkLoadMore);
+    var current = window.location.href;
     const api = new API();
     api.getMe(auth_token).then((json) => {
         console.log(json);
@@ -995,6 +1001,7 @@ export function makeProfile(auth_token) {
         }
 
         const user = createElement('div', null, {id : 'profile-username'} );
+        window.location.href = current.replace(/#(.*)$/, '') + '#' + `profile=${json.username}`;
         user.appendChild(createElement('h2', json.username, {id : 'profile-username-inner'}));
         user.appendChild(createElement('small',json.name, {id :'profile-name-inner'}));
         const info = createElement('ul', null, {class : 'profile-top list-inline'});

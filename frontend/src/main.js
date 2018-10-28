@@ -1,5 +1,5 @@
 // importing named exports we use brackets
-import { createLoginForm,update, follow, closeFollowModal, unfollow, closeUnFollowModal, closeUpdate, makeProfile, postImage, closePosts, getDetails, logout, randomInteger, createPostTile, uploadImage, checkStore, createElement } from './helpers.js';
+import { createLoginForm, createRegisterForm, update, follow, closeFollowModal, unfollow, closeUnFollowModal, closeUpdate, makeProfile, showPublicProfile, postImage, closePosts, getDetails, logout, randomInteger, createPostTile, uploadImage, checkStore, createElement } from './helpers.js';
 
 // when importing 'default' exports, use below syntax
 import API from './api.js';
@@ -12,6 +12,8 @@ export function renderFeed(auth_token) {
 
     // Set the current authorisation token
     window.localStorage.setItem('current', auth_token);
+
+    const api = new API();
 
     // Remove all login and register DOM elements if present
     const login = document.getElementById('login');
@@ -41,28 +43,28 @@ export function renderFeed(auth_token) {
     });
 
     // Post link
-    const posting = createElement('a', 'Post', {class : 'topnav-item', href : '/#'});
+    const posting = createElement('a', 'Post', {class : 'topnav-item', href : `/#profile=${checkStore('cur_user')}`});
     posting.addEventListener('click', (event) => postImage(event, auth_token));
     const close = document.getElementsByClassName("close")[2];
     close.addEventListener('click', closePosts);
     navbar.appendChild(posting);
 
     // Updating profile link
-    const updateInfo = createElement('a', 'Update profile', {class : 'topnav-item', href : '/#'});
+    const updateInfo = createElement('a', 'Update profile', {class : 'topnav-item', href: `/#profile=${checkStore('cur_user')}`});
     updateInfo.addEventListener('click', () => update(auth_token));
     const closeUp = document.getElementsByClassName("close")[3];
     closeUp.addEventListener('click', closeUpdate);
     navbar.appendChild(updateInfo);
     
     // Following someone link
-    const followSomeone = createElement('a', 'Follow', {class : 'topnav-item', href : '/#'});
+    const followSomeone = createElement('a', 'Follow', {class : 'topnav-item', href : `/#profile=${checkStore('cur_user')}`});
     followSomeone.addEventListener('click', () => follow(auth_token));
     const closeFollow = document.getElementsByClassName("close")[4];
     closeFollow.addEventListener('click', closeFollowModal);
     navbar.appendChild(followSomeone);
 
     // Unfollowing someone link
-    const unfollowSomeone = createElement('a', 'Unfollow', {class : 'topnav-item', href : '/#'});
+    const unfollowSomeone = createElement('a', 'Unfollow', {class : 'topnav-item', href : `/#profile=${checkStore('cur_user')}`});
     unfollowSomeone.addEventListener('click', () => unfollow(auth_token));
     const closeUnFollow = document.getElementsByClassName("close")[4];
     closeUnFollow.addEventListener('click', closeUnFollowModal);
@@ -85,6 +87,8 @@ export function renderFeed(auth_token) {
 // Function which actually adds the feed to the home page
 function makeHome() {
 
+    var current = window.location.href;
+    window.location.href = current.replace(/#(.*)$/, '') + '#feed';
     // Got this code off stack overflow, and modified to remove all posts under large-feed
     loadFlag = false;
     const auth_token = checkStore('current');
@@ -163,17 +167,104 @@ export function checkLoadMore() {
     }
 }   
 
-    
+var hash = window.location.href.split('#')[1] || '';
+const profilePattern = /^profile=/i;
+console.log(hash);
+if (hash == 'login') {
+    logout();
+} else if (hash =='register') {
+    window.localStorage.setItem('status', 'loggedOut');
+    createRegisterForm();
+} else if (checkStore('status') == 'loggedOut') {
+    var main = document.getElementById('large-feed');
+    const form = createLoginForm();
+    main.appendChild(createLoginForm());
+    const button = document.getElementById('submit');
+    console.log(button);
+    button.addEventListener('click', getDetails);
+} else if (profilePattern.exec(hash)) {
+    const username = hash.replace(profilePattern, '');
+    const auth_token = checkStore('current');
+    console.log(username);
+    const api = new API();
+    api.getUserByUsername((checkStore('current'), username )).then((response) => {
+        if (response) {
 
-// Main code
-const api  = new API();
-if (checkStore('status') === 'loggedOut') {
-   var main = document.getElementById('large-feed');
-   const form = createLoginForm();
-   main.appendChild(createLoginForm());
-   const button = document.getElementById('submit');
-   console.log(button);
-   button.addEventListener('click', getDetails);
+            // Remove all login and register DOM elements if present
+            const login = document.getElementById('login');
+            if (login != null) {
+                const main = document.getElementById('large-feed');
+                main.removeChild(login);
+            }
+            const register = document.getElementById('register');
+            if (register != null) {
+                const main = document.getElementById('large-feed');
+                main.removeChild(register);
+            }
+        
+            // Code to make the navBar, and its appropriate event listeners
+            const navbar = document.getElementById('nav');
+            const logOut = createElement('a', 'Log out', {id : 'logout', class : 'topnav-item', href : '#login'});
+            logOut.addEventListener('click', logout);
+            navbar.appendChild(logOut);
+        
+            // I also add the current user's username to the local storage, which is useful
+            api.getMe(auth_token).then((json) => {
+                console.log(json);
+                window.localStorage.setItem('cur_user', json.username);
+                const profile = createElement('a', `Me`, {class : 'topnav-item', href : `#profile=${checkStore('cur_user')}`});
+                profile.addEventListener('click',(event) => makeProfile(auth_token));
+                navbar.appendChild(profile);
+            });
+        
+            // Post link
+            const posting = createElement('a', 'Post', {class : 'topnav-item', href : `#profile=${checkStore('cur_user')}`});
+            posting.addEventListener('click', (event) => postImage(event, auth_token));
+            const close = document.getElementsByClassName("close")[2];
+            close.addEventListener('click', closePosts);
+            navbar.appendChild(posting);
+        
+            // Updating profile link
+            const updateInfo = createElement('a', 'Update profile', {class : 'topnav-item', href : `#profile=${checkStore('cur_user')}`});
+            updateInfo.addEventListener('click', () => update(auth_token));
+            const closeUp = document.getElementsByClassName("close")[3];
+            closeUp.addEventListener('click', closeUpdate);
+            navbar.appendChild(updateInfo);
+            
+            // Following someone link
+            const followSomeone = createElement('a', 'Follow', {class : 'topnav-item', href : `#profile=${checkStore('cur_user')}`});
+            followSomeone.addEventListener('click', () => follow(auth_token));
+            const closeFollow = document.getElementsByClassName("close")[4];
+            closeFollow.addEventListener('click', closeFollowModal);
+            navbar.appendChild(followSomeone);
+        
+            // Unfollowing someone link
+            const unfollowSomeone = createElement('a', 'Unfollow', {class : 'topnav-item', href : `#profile=${checkStore('cur_user')}`});
+            unfollowSomeone.addEventListener('click', () => unfollow(auth_token));
+            const closeUnFollow = document.getElementsByClassName("close")[4];
+            closeUnFollow.addEventListener('click', closeUnFollowModal);
+            navbar.appendChild(unfollowSomeone);
+        
+        
+            const closeUpdatePosts = document.getElementsByClassName("close")[5];
+            closeUpdatePosts.addEventListener('click', () => {
+                const modal = document.getElementById('updatePostsModal');
+                modal.style.display = 'none';
+            });
+            
+            // Link to home page on instagram logo
+            const homeLink = document.getElementById('home');
+            homeLink.addEventListener('click',() => makeHome(auth_token));
+        
+            if (checkStore('cur_user') == username) {
+                makeProfile(checkStore('current'));
+            } else {
+                showPublicProfile(auth_token, username);
+            }
+        } else {
+            renderFeed(checkStore('current'));
+        }
+    })
 } else {
     renderFeed(checkStore('current'));
 }
