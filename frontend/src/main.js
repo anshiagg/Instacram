@@ -101,6 +101,7 @@ function makeHome() {
     .then(posts => posts[0].posts.sort((a,b) =>  new Date(b.meta.published) - new Date(a.meta.published)))
     .then(posts => {
         console.log(posts);
+        startNumber += posts.length;
         posts.reduce((parent, post) => {
             parent.appendChild(createPostTile(post, auth_token));
             console.log(post.id);
@@ -110,8 +111,8 @@ function makeHome() {
     })
     .catch(err => console.log('Some error occurred', err));
 
-    // Checks every 2 seconds if needs to show more posts
-    setInterval(checkLoadMore, 2000);
+    // Checks every 1 second if needs to show more posts
+    setInterval(checkLoadMore, 400);
 }
 
 export function checkLoadMore() {

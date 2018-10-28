@@ -5,3 +5,4 @@
 26/10/18   11:00   22:20            Worked on subset 3 and implemented all parts except infinite scrolling
 27/10/18   10:00   14:00			Worked on fixing some bugs with posting, following, unfollowing and commenting
 27/10/18   16:00   20:00  			Worked on implementing infinite scroll, and implemented it
+28/10/18   10:00   11:40            Worked on fixing bugs with infinite scroll, and then implemented live update for posting and deleting images

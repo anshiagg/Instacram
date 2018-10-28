@@ -186,7 +186,7 @@ function register(e) {
 export function createPostTile(post, auth_token) {
     const section = createElement('section', null, { class: 'post', id : `post-${post.id}` });
     const parentDiv = createElement('span', null, {class : 'post-title'});
-    const userName = createElement('h2', post.meta.author, {id : 'post-username', style : "float:left"});
+    const userName = createElement('h2', post.meta.author, {id : `post-${post.id}-username`, style : "float:left"});
     userName.addEventListener('click', () => showPublicProfile(auth_token, post.meta.author));
     parentDiv.appendChild(userName);
 
@@ -244,6 +244,17 @@ function deletePost(auth_token, id) {
         if (response.status !== 200) {
             console.log('Delete failed');
         }
+        const feed = document.getElementById('large-feed');
+        const deletedPost = document.getElementById(`post-${id}`);
+        const author = document.getElementById(`post-${id}-username`).innerText;
+        feed.removeChild(deletedPost);
+        const post_num = document.getElementById('num-posts');
+        console.log(author);
+        api.getUserByUsername(auth_token, author).then((user => {
+            console.log(user);
+            post_num.innerText = `${user.posts.length} posts`;
+        }))
+
     })
 }
 
@@ -340,7 +351,6 @@ function updateImage(id, desc, file, auth_token) {
             if (promise.status !== 200) {
                 console.log("failed");
             }
-
         };
 
         // this returns a base64 image
@@ -536,7 +546,7 @@ export function update(auth_token) {
         var paras = document.getElementsByClassName('alert alert-danger');
         while(paras[0]) 
             paras[0].parentNode.removeChild(paras[0]);
-
+        console.log(newName + newPass + newEmail);
         // Some error checking
         if (newName == "" && newPass == "" && newEmail == "") {
             if (!document.getElementById('empty-update-desc-error')) {
@@ -560,7 +570,21 @@ export function update(auth_token) {
             const section = createElement('div', 'Update successful', {class : 'alert alert-success', id : 'success-update'});
             modalBody.appendChild(section);
         }
-        api.update_user(auth_token, userUpdate);
+        api.update_user(auth_token, userUpdate).then(response => {
+            console.log(response);
+            if (response.msg != "success") {
+                if (!document.getElementById('failure-update')) {
+                    const section = createElement('div', 'Update failed', {class : 'alert alert-danger', id : 'failure-update'});
+                    modalBody.appendChild(section);
+                }
+                return;
+            }
+            if (userUpdate.name) {
+                const name = document.getElementById('profile-name-inner');
+                if (name == null) return;
+                name.innerText = userUpdate.name;
+            }
+        })
     })
     var paras = document.getElementsByClassName('alert alert-danger');
     while(paras[0]) 
@@ -626,6 +650,12 @@ export function follow(auth_token) {
                     const section = createElement('div', 'Follow successful', {class : 'alert alert-success', id : 'follow-success'});
                     modalBody.appendChild(section);
                 }
+                const numFollowing = document.getElementById('num-following');
+                if (numFollowing == null) return;
+                api.getMe(auth_token).then((user) => {
+                    console.log(user);
+                    numFollowing.innerText = user.following.length + " following";
+                })
             }
         })
     })
@@ -692,6 +722,12 @@ export function unfollow(auth_token) {
                     const section = createElement('div', 'User unfollowed', {class : 'alert alert-success', id : 'unfollow-success'});
                     modalBody.appendChild(section);
                 }
+                const numFollowing = document.getElementById('num-following');
+                if (numFollowing == null) return;
+                api.getMe(auth_token).then((user) => {
+                    console.log(user);
+                    numFollowing.innerText = user.following.length + " following";
+                })
             }
         })
     })
@@ -751,7 +787,22 @@ export function uploadImage(desc, file, auth_token) {
         console.log("Here in uploadImage");
         console.log(auth_token);
         console.log(img);
-        api.make_post(auth_token, img);
+        api.make_post(auth_token, img).then((json => {
+            console.log(json);
+            const postId = json.post_id;
+            api.get_post(auth_token, postId).then((post) => {
+                const feed = document.getElementById('large-feed');
+                //feed.appendChild(createPostTile(post, auth_token));
+                const post_num = document.getElementById('num-posts');
+                if (post_num == null) return;
+                feed.insertBefore(createPostTile(post, auth_token), feed.children[2]);
+                console.log(post);
+                api.getUserByUsername(auth_token, post.meta.author).then((user => {
+                    console.log(user);
+                    post_num.innerText = `${user.posts.length} posts`;
+                }))
+            })
+        }))
 
     };
 
@@ -945,19 +996,19 @@ export function makeProfile(auth_token) {
 
         const user = createElement('div', null, {id : 'profile-username'} );
         user.appendChild(createElement('h2', json.username, {id : 'profile-username-inner'}));
-        user.appendChild(createElement('small',json.name, {}));
+        user.appendChild(createElement('small',json.name, {id :'profile-name-inner'}));
         const info = createElement('ul', null, {class : 'profile-top list-inline'});
         const postsNum = createElement('li', null, {class : 'profile-top-item list-item-inline'});
-        postsNum.appendChild(createElement('h4', `${json.posts.length} posts`, {class : 'mb-1'}));
+        postsNum.appendChild(createElement('h4', `${json.posts.length} posts`, {class : 'mb-1', id : 'num-posts'}));
         info.appendChild(postsNum);
         const followersNum = createElement('li', null, {class : 'profile-top-item list-item-inline'});
         followersNum.appendChild(createElement('h4', `${json.followed_num} followers`, {class : 'mb-1'}));
         info.appendChild(followersNum);
         const followingNum = createElement('li', null, {class : 'profile-top-item list-item-inline'});
-        followingNum.appendChild(createElement('h4', `${json.following.length} following`, {class : 'mb-1', style : "cursor:pointer"}));
+        followingNum.appendChild(createElement('h4', `${json.following.length} following`, {class : 'mb-1', style : "cursor:pointer" ,id : 'num-following'}));
 
         // You can see a list of people you are following by clicking on the following number
-        followingNum.addEventListener('click', ()=> showFollowing(auth_token,json.following));
+        followingNum.addEventListener('click', ()=> showFollowing(auth_token,json.id));
         info.appendChild(followingNum);
         const likesNum = createElement('li', null, {class : 'profile-top-item list-item-inline'});
         likesNum.appendChild(createElement('h4',null, {class : 'mb-1', id : 'likes-num'}));
@@ -985,7 +1036,7 @@ export function makeProfile(auth_token) {
 }
 
 // Shows all the people the user is following
-function showFollowing(auth_token, following) {
+function showFollowing(auth_token, id) {
     const modal = document.getElementById('likesModal');
     const heading = document.getElementById('likesTitle');
     heading.innerText = "Users you follow";
@@ -993,14 +1044,17 @@ function showFollowing(auth_token, following) {
     followingBody.innerText = "";
     const listFollowing = createElement('ul', null, {class: 'list-group list-group-flush'});
     const api = new API();
-    for (var id in following) {
-        console.log(following[id]);
-        api.getUser(auth_token,following[id]).then(json => {
-            const follow_user = createElement('li', json.username, {class : 'list-group-item'} );
-            listFollowing.appendChild(follow_user);
-        });
-    }
-    followingBody.appendChild(listFollowing);
+    api.getUser(auth_token, id).then((user => {
+        const following = user.following;
+        for (var id in following) {
+            console.log(following[id]);
+            api.getUser(auth_token,following[id]).then(json => {
+                const follow_user = createElement('li', json.username, {class : 'list-group-item'} );
+                listFollowing.appendChild(follow_user);
+            });
+        }
+        followingBody.appendChild(listFollowing);
+    }))
     const span = document.getElementsByClassName("close")[0];
     span.addEventListener('click', closeLikes);
     modal.style.display = 'block';
