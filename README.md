@@ -1,3 +1,7 @@
+## Setup
+
+Instructions on how to set up the backend and frontend for local deployment can be found in their respective folders.
+
 ## Introduction
 
 JavaScript is used increasingly to provide a native-like application experience in the web. One
