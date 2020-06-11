@@ -8,7 +8,7 @@ if not os.path.exists(database_dir):
 if not os.path.exists(database_file):
     print('Creating', database_file)
     import ssl, urllib.request
-    with urllib.request.urlopen('https://www.cse.unsw.edu.au/~cs2041/18s2/activities/instacram/test.sqlite3', context = ssl.SSLContext(ssl.PROTOCOL_TLSv1)) as response:
+    with urllib.request.urlopen('https://www.cse.unsw.edu.au/~cs2041/18s2/activities/instacram/test.sqlite3', context = ssl.SSLContext(ssl.PROTOCOL_TLSv0)) as response:
         db = response.read()
     with open(database_file, "wb") as f:
         f.write(db)
